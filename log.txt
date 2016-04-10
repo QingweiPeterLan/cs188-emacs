@@ -1,25 +1,42 @@
 
---------------------- Lab notebook for 'emacs' assignment ---------------------
+===================== Lab notebook for 'emacs' assignment =====================
 
-First I built the emacs program with
+(1) Building & Programming Environment Setup
 
-  $ make
+		First I built the emacs program with
 
-Then for testing out interactive emacs I created the file 'num-search.el' with
-the function 'multiply-by-seven'
+		  $ make
 
-  (defun multiply-by-seven (number)
-		"Multiply NUMBER by seven."
-		(interactive "p")
-		(message "The result is: %d" (* 7 number)))
+		Then for testing out interactive emacs I created the file 'num-search.el'
+		with the function 'multiply-by-seven'
 
-Then I tested this function out with
+		  (defun multiply-by-seven (number)
+				"Multiply NUMBER by seven."
+				(interactive "p")
+				(message "The result is: %d" (* 7 number)))
 
-  $ src/emacs
-  $ (emacs) M-x load-file
-  $ (emacs) lisp/num-search.el RET
-  $ (emacs) M-5 M-x multiply-by-seven RET
+		Then I tested this function out with
 
-    The result is: 35
+		  $ src/emacs &
+		  $ (emacs) M-x load-file
+		  $ (emacs) lisp/num-search.el RET
+		  $ (emacs) M-5 M-x multiply-by-seven RET
 
-This shows that my test has worked out nicely
+		    The result is: 35
+
+		This shows that my test has worked out nicely
+		Next I changed the interactive line to
+
+		  (interactive "nEnter the number to multiply by seven: ")
+
+		Now emacs will use a minibuffer for the interaction, which will be easier
+		for the user to use now that we do not need to enter a prefix
+
+		  $ src/emacs &
+		  $ (emacs) lisp/num-search.el RET
+		  $ (emacs) M-x multiply-by-seven RET
+
+		    Enter the number to multiply by seven: 10 RET
+		    The result is: 70
+
+		Now this test has also worked out nicely

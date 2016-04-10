@@ -5,5 +5,5 @@
 
 (defun multiply-by-seven (number)
 	"Multiply NUMBER by seven."
-	(interactive "p")
+	(interactive "nEnter the number to multiply by seven: ")
 	(message "The result is: %d" (* 7 number)))
