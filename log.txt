@@ -1,0 +1,25 @@
+
+--------------------- Lab notebook for 'emacs' assignment ---------------------
+
+First I built the emacs program with
+
+  $ make
+
+Then for testing out interactive emacs I created the file 'num-search.el' with
+the function 'multiply-by-seven'
+
+  (defun multiply-by-seven (number)
+		"Multiply NUMBER by seven."
+		(interactive "p")
+		(message "The result is: %d" (* 7 number)))
+
+Then I tested this function out with
+
+  $ src/emacs
+  $ (emacs) M-x load-file
+  $ (emacs) lisp/num-search.el RET
+  $ (emacs) M-5 M-x multiply-by-seven RET
+
+    The result is: 35
+
+This shows that my test has worked out nicely
