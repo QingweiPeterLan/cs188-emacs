@@ -19,7 +19,7 @@
 
 		  $ src/emacs &
 		  $ (emacs) M-x load-file
-		  $ (emacs) lisp/num-search.el RET
+		  $ (emacs) num-search.el RET
 		  $ (emacs) M-5 M-x multiply-by-seven RET
 
 		    The result is: 35
@@ -33,10 +33,22 @@
 		for the user to use now that we do not need to enter a prefix
 
 		  $ src/emacs &
-		  $ (emacs) lisp/num-search.el RET
+		  $ (emacs) num-search.el RET
 		  $ (emacs) M-x multiply-by-seven RET
 
 		    Enter the number to multiply by seven: 10 RET
 		    The result is: 70
 
 		Now this test has also worked out nicely
+
+(2) Actual Coding For 'num-search-forward'
+
+    Define function with interactive prompts
+
+			(defun num-search-forward (NUM1 &optional NUM2 BASE)
+			  "Search for NUM1, or range [NUM1, NUM2], in base BASE (default 10)"
+			  (interactive "nNumber to search for: \nnUpper bound for range search: \nnNumber base [2-16]: "))
+
+    This has 3 interactive prompts with NUM1, NUM2, and BASE
+    However this may not be useful for our testing since I haven't figured out
+    how to use &optional interactive prompts. I will start testing out ERT.
