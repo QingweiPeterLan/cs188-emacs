@@ -3,52 +3,76 @@
 
 (1) Building & Programming Environment Setup
 
-		First I built the emacs program with
+    First I built the emacs program with
 
-		  $ make
+      $ make
 
-		Then for testing out interactive emacs I created the file 'num-search.el'
-		with the function 'multiply-by-seven'
+    Then for testing out interactive emacs I created the file 'num-search.el'
+    with the function 'multiply-by-seven'
 
-		  (defun multiply-by-seven (number)
-				"Multiply NUMBER by seven."
-				(interactive "p")
-				(message "The result is: %d" (* 7 number)))
+      (defun multiply-by-seven (number)
+        "Multiply NUMBER by seven."
+        (interactive "p")
+        (message "The result is: %d" (* 7 number)))
 
-		Then I tested this function out with
+    Then I tested this function out with
 
-		  $ src/emacs &
-		  $ (emacs) M-x load-file
-		  $ (emacs) num-search.el RET
-		  $ (emacs) M-5 M-x multiply-by-seven RET
+      $ src/emacs &
+      $ (emacs) M-x load-file
+      $ (emacs) num-search.el RET
+      $ (emacs) M-5 M-x multiply-by-seven RET
 
-		    The result is: 35
+        The result is: 35
 
-		This shows that my test has worked out nicely
-		Next I changed the interactive line to
+    This shows that my test has worked out nicely
+    Next I changed the interactive line to
 
-		  (interactive "nEnter the number to multiply by seven: ")
+      (interactive "nEnter the number to multiply by seven: ")
 
-		Now emacs will use a minibuffer for the interaction, which will be easier
-		for the user to use now that we do not need to enter a prefix
+    Now emacs will use a minibuffer for the interaction, which will be easier
+    for the user to use now that we do not need to enter a prefix
 
-		  $ src/emacs &
-		  $ (emacs) num-search.el RET
-		  $ (emacs) M-x multiply-by-seven RET
+      $ src/emacs &
+      $ (emacs) num-search.el RET
+      $ (emacs) M-x multiply-by-seven RET
 
-		    Enter the number to multiply by seven: 10 RET
-		    The result is: 70
+        Enter the number to multiply by seven: 10 RET
+        The result is: 70
 
-		Now this test has also worked out nicely
+    Now this test has also worked out nicely
 
-(2) Actual Coding For 'num-search-forward'
+(2) Testing with ERT
 
     Define function with interactive prompts
 
-			(defun num-search-forward (NUM1 &optional NUM2 BASE)
-			  "Search for NUM1, or range [NUM1, NUM2], in base BASE (default 10)"
-			  (interactive "nNumber to search for: \nnUpper bound for range search: \nnNumber base [2-16]: "))
+      (defun num-search-forward (NUM1 &optional NUM2 BASE)
+        "Search for NUM1, or range [NUM1, NUM2], in base BASE (default 10)"
+        (interactive "nNumber to search for: \nnUpper bound for range search: \nnNumber base [2-16]: "))
 
     This has 3 interactive prompts with NUM1, NUM2, and BASE
     However this may not be useful for our testing since I haven't figured out
     how to use &optional interactive prompts. I will start testing out ERT.
+    To use ERT to run all tests, I created a file 'num-search-tests.el' and ran
+
+      $ src/emacs -batch -l ert -l num-search.el -l num-search-tests.el -f
+        ert-run-tests-batch
+
+    I put the tests in 'num-search-tests.el', one example:
+
+      (ert-deftest num-search-forward-test-1-1 ()
+        (with-temp-buffer
+          (insert "Hello57 world!575")
+          (beginning-of-buffer)
+          (num-search-forward 57)
+          (should (= (point) 8))))
+
+(3) Actual Coding for 'num-search-forward'
+
+    I first implemented the part with only NUM1 defined (NUM2 & BASE are nil).
+    For this to work, I translated the number to a regular expression and ran
+    the builtin function 're-search-forward'. The regex is of the form
+    '[^0-9]*+?0*NUM1[^0-9]+' or '[^0-9]*-0*NUM1[^0-9]+' if NUM1 is negative.
+    Since this includes the trailing non-digit characters, we record the last
+    digit of NUM1 and run the builtin function 're-search-backward' on the
+    last digit of NUM1. After that we move the cursor forward by 1 character
+    using the builtin function 'forward-char'.
