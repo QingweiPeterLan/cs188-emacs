@@ -4,25 +4,6 @@
 
 ; =================================================
 
-; regex generation tests
-(ert-deftest regex-gen-test1 ()
-    (should (string= (generate-regex-for-num 55) "[^0-9]*+?0*55[^0-9]+")))
-(ert-deftest regex-gen-test2 ()
-    (should (string= (generate-regex-for-num -55) "[^0-9]*-0*55[^0-9]+")))
-(ert-deftest regex-gen-test3 ()
-    (should (string= (generate-regex-for-num +55) "[^0-9]*+?0*55[^0-9]+")))
-(ert-deftest regex-gen-test4 ()
-    (should (string= (generate-regex-for-num -055) "[^0-9]*-0*55[^0-9]+")))
-(ert-deftest regex-gen-test5 ()
-    (should (string= (generate-regex-for-num +055) "[^0-9]*+?0*55[^0-9]+")))
-(ert-deftest regex-gen-test6 ()
-    (should (string= (generate-regex-for-num 57) "[^0-9]*+?0*57[^0-9]+")))
-
-(ert-deftest regex-gen-test-base1 ()
-    (should (string= (generate-regex-for-num-with-base 255 16) "[^0-9]*+?0*FF[^0-9]+")))
-
-; =================================================
-
 ; tests for num-search-forward
 (ert-deftest num-search-forward-test-1-1 ()
     (with-temp-buffer
@@ -138,3 +119,50 @@
         (goto-char 10)
         (num-search-forward 575)
         (should (= (point) 22))))
+
+; =================================================
+
+(ert-deftest num-search-forward-test-base-1-1 ()
+    (with-temp-buffer
+        (insert "HelloFFF world!FFl.")
+        (beginning-of-buffer)
+        (num-search-forward 255 nil 16)
+        (should (= (point) 18))))
+
+(ert-deftest num-search-forward-test-base-1-2 ()
+    (with-temp-buffer
+        (insert "FFHelloFFF world!FFl.")
+        (beginning-of-buffer)
+        (num-search-forward 255 nil 16)
+        (should (= (point) 3))))
+
+(ert-deftest num-search-forward-test-base-1-3 ()
+    (with-temp-buffer
+        (insert "FFFHelloFFF world!FFl.")
+        (beginning-of-buffer)
+        (num-search-forward 255 nil 16)
+        (should (= (point) 21))))
+
+(ert-deftest num-search-forward-test-base-1-4 ()
+    (with-temp-buffer
+        (insert "FFHelloFFF world!FFl.")
+        (beginning-of-buffer)
+        (goto-char 2)
+        (num-search-forward 255 nil 16)
+        (should (= (point) 20))))
+
+; =================================================
+
+(ert-deftest num-search-forward-test-multi-line-1 ()
+    (with-temp-buffer
+        (insert "FFFHelloFF\nFFworldFFl.")
+        (beginning-of-buffer)
+        (num-search-forward 255 nil 16)
+        (should (= (point) 11))))
+
+(ert-deftest num-search-forward-test-multi-line-2 ()
+    (with-temp-buffer
+        (insert "FFFHelloFFF\nFFworldFFl.")
+        (beginning-of-buffer)
+        (num-search-forward 255 nil 16)
+        (should (= (point) 15))))

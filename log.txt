@@ -68,11 +68,41 @@
 
 (3) Actual Coding for 'num-search-forward'
 
-    I first implemented the part with only NUM1 defined (NUM2 & BASE are nil).
-    For this to work, I translated the number to a regular expression and ran
-    the builtin function 're-search-forward'. The regex is of the form
-    '[^0-9]*+?0*NUM1[^0-9]+' or '[^0-9]*-0*NUM1[^0-9]+' if NUM1 is negative.
-    Since this includes the trailing non-digit characters, we record the last
-    digit of NUM1 and run the builtin function 're-search-backward' on the
-    last digit of NUM1. After that we move the cursor forward by 1 character
-    using the builtin function 'forward-char'.
+    (a) where only NUM1 is defined
+
+        I first implemented the part with only NUM1 defined (NUM2 & BASE are
+        nil). For this to work, I translated the number to a regular expression
+        and ran the builtin function 're-search-forward'. The regex is of the
+        form '[^0-9]*+?0*NUM1[^0-9]+' or '[^0-9]*-0*NUM1[^0-9]+' if NUM1 is
+        negative. Since this includes the trailing non-digit characters, we
+        record the last digit of NUM1 and run the builtin function 're-search-
+        backward' on the last digit of NUM1. After that we move the cursor
+        forward by 1 character using the builtin function 'forward-char'. This
+        implementation passed my self-defined tests.
+
+        EDIT: Instead of running 're-search-forward' then running 're-search-
+        backward', I will modify the regex to match only 1 trailing character,
+        then after 're-search-forward', I will simply move the cursor back one
+        character. This is easier to implement and faster and most of all, it
+        does not compromise correctness.
+
+        EDIT: We need different pattern matchings for when the cursor is at
+        position 1 and other positions. When the cursor is at position 1 or
+        the start of the buffer, we should use the pattern '^+?0*NUM1[^0-9]+'
+        if NUM1 is positive and '^-0*NUM1[^0-9]+' if NUM1 is negative. This
+        passes the tests given.
+
+    (b) where BASE is defined
+
+        Next I implemented the part where we define a number base BASE for the
+        search by first specifying the character sets for each number base
+        with a function 'inverse-character-set-for-base'. This takes 1
+        argument and returns a string in regex format of the inverse character
+        set of the given BASE.
+
+        Next I used this function to generate the full regex for NUM1 with
+        BASE defined. E.g. for NUM1 = 255, BASE = 16, the regex generated is
+        "[^0-9A-Fa-f]*+?0*FF[^0-9A-Fa-f]+".
+
+        Last, we will use the algorithm in part (a) and the regex generated to
+        implement the search.
