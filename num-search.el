@@ -26,9 +26,11 @@
 
 ; used for generating regex for number
 ; ex.  567
-;     +567  ==>  [^0-9]*+?0*567[^0-9]*
+;     +567  ==>  [^0-9]*+?0*567[^0-9]
+;                ^+?0*567[^0-9]
 ;
-; ex. -567  ==>  [^0-9]*-0*567[^0-9]*
+; ex. -567  ==>  [^0-9]*-0*567[^0-9]
+;                ^-0*567[^0-9]
 (defun generate-regex-for-num (NUMBER)
   "Generates regex for specified NUMBER"
   (let ((calc-number-radix 10))
