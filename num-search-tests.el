@@ -2,162 +2,115 @@
 
 (require 'calc-bin)
 
-; =================================================
 
-; tests for num-search-forward
-(ert-deftest num-search-forward-test-1-1 ()
+; -------------------------------------------------------------------
+; not implemented parts: range search & range search with BASE
+
+(ert-deftest range-search-fail ()
+    "Range search is not implemented."
+    :expected-result :failed
     (with-temp-buffer
-        (insert "Hello57 world!575")
+        (insert "Hello 55 World!")
         (beginning-of-buffer)
-        (num-search-forward 57)
-        (should (= (point) 8))))
+        (should (= (num-search-forward 10 100) 9))))
 
-(ert-deftest num-search-forward-test-1-2 ()
+(ert-deftest range-search-base-fail ()
+    "Range search with BASE is not implemented."
+    :expected-result :failed
     (with-temp-buffer
-        (insert "Hello57 world!575")
+        (insert "Hello FF World!")
         (beginning-of-buffer)
-        (num-search-forward +57)
-        (should (= (point) 8))))
+        (should (= (num-search-forward 200 300 16) 9))))
 
-(ert-deftest num-search-forward-test-1-3 ()
+
+; -------------------------------------------------------------------
+; tests that should report errors
+
+(ert-deftest num-search-forward-test-range-fail ()
     (with-temp-buffer
-        (insert "Hello57 world!575")
+        (insert "NOTHING HERE")
         (beginning-of-buffer)
-        (num-search-forward +000057)
-        (should (= (point) 8))))
+        (should (= (point) 1))
+        (should-error (num-search-forward 100 10))))
 
-(ert-deftest num-search-forward-test-1-4 ()
+(ert-deftest num-search-forward-test-base-fail-1 ()
     (with-temp-buffer
-        (insert "Hello57 world!575")
+        (insert "NOTHING HERE")
         (beginning-of-buffer)
-        (num-search-forward 000000057)
-        (should (= (point) 8))))
+        (should (= (point) 1))
+        (should-error (num-search-forward 100 nil 1))))
 
-(ert-deftest num-search-forward-test-1-5 ()
+(ert-deftest num-search-forward-test-base-fail-2 ()
     (with-temp-buffer
-        (insert "Hello57 world!575")
+        (insert "NOTHING HERE")
         (beginning-of-buffer)
-        (should-error (num-search-forward -57))))
+        (should (= (point) 1))
+        (should-error (num-search-forward 100 nil 17))))
 
-; =================================================
 
-(ert-deftest num-search-forward-test-2-1 ()
+; -------------------------------------------------------------------
+; normal tests
+
+(ert-deftest num-search-forward-test-empty ()
     (with-temp-buffer
-        (insert "Hello+00057 world!575")
+        (insert "")
         (beginning-of-buffer)
-        (should-error (num-search-forward -57))))
+        (should-error (num-search-forward 57)) ; should error for empty
+    ))
 
-(ert-deftest num-search-forward-test-2-2 ()
+(ert-deftest num-search-forward-test-normal ()
     (with-temp-buffer
-        (insert "Hello+00057 world!575")
+        (insert "57H579E\n457L-57L\n+57E W0057E+0057R-0057R")
+        (should-error (num-search-forward 57)) ; search fails
         (beginning-of-buffer)
-        (num-search-forward 57)
-        (should (= (point) 12))))
+        (should (= (point) 1)) ; sanity check
+        (should (= (num-search-forward +0057) 3)) ; check search start of line
+        (should (= (num-search-forward 57) 21)); skip leading and trailing (579 & 457)
+        (should (= (num-search-forward 57) 28)) ; with plus sign
+        (should (= (num-search-forward 57) 34)); with leading zeros
+        (beginning-of-buffer)
+        (should (= (point) 1)) ; sanity check
+        (should (= (num-search-forward -00000057) 16)) ; negative number search
+        (should (= (num-search-forward -57) 40)) ; negative number with leading zeroes
+    ))
 
-(ert-deftest num-search-forward-test-2-3 ()
+(ert-deftest num-search-forward-test-base-1 ()
     (with-temp-buffer
-        (insert "Hello-000000057 world!575")
+        (insert "FFHFFF!FFl\n+FF.+000FF.-FF.-000FF.")
         (beginning-of-buffer)
-        (num-search-forward -57)
-        (should (= (point) 16))))
+        (should (= (point) 1))
+        (should (= (num-search-forward 255 nil 16) 3)) ; check search start of line
+        (should (= (num-search-forward 255 nil 16) 10)) ; skip leading and trailing (FFF)
+        (should (= (num-search-forward 255 nil 16) 15)) ; check leading plus
+        (should (= (num-search-forward 255 nil 16) 22)) ; check leading zeros
+        (should (= (num-search-forward -255 nil 16) 26)) ; negative number search
+        (should (= (num-search-forward -255 nil 16) 33)) ; negative number with leading zeros
+    ))
 
-(ert-deftest num-search-forward-test-2-4 ()
+; same test as above with case insensitive search
+(ert-deftest num-search-forward-test-base-2 ()
     (with-temp-buffer
-        (insert "Hello000057 world!575")
+        (insert "ffHfff!ffl\n+ff.+000ff.-ff.-000ff.")
         (beginning-of-buffer)
-        (num-search-forward 57)
-        (should (= (point) 12))))
+        (should (= (point) 1))
+        (should (= (num-search-forward 255 nil 16) 3)) ; check search start of line
+        (should (= (num-search-forward 255 nil 16) 10)) ; skip leading and trailing (FFF)
+        (should (= (num-search-forward 255 nil 16) 15)) ; check leading plus
+        (should (= (num-search-forward 255 nil 16) 22)) ; check leading zeros
+        (should (= (num-search-forward -255 nil 16) 26)) ; negative number search
+        (should (= (num-search-forward -255 nil 16) 33)) ; negative number with leading zeros
+    ))
 
-(ert-deftest num-search-forward-test-2-5 ()
+; same test as above with case insensitive search (mixture)
+(ert-deftest num-search-forward-test-base-3 ()
     (with-temp-buffer
-        (insert "Hello000057 world!575")
+        (insert "fFHfff!ffl\n+Ff.+000Ff.-fF.-000Ff.")
         (beginning-of-buffer)
-        (goto-char 7)
-        (num-search-forward 57)
-        (should (= (point) 12))))
-
-(ert-deftest num-search-forward-test-2-6 ()
-    (with-temp-buffer
-        (insert "Hello000057 world!575")
-        (beginning-of-buffer)
-        (goto-char 15)
-        (should-error (num-search-forward 57))))
-
-(ert-deftest num-search-forward-test-2-7 ()
-    (with-temp-buffer
-        (insert "Hello000057 world!575")
-        (beginning-of-buffer)
-        (goto-char 11)
-        (should-error (num-search-forward 57))))
-
-(ert-deftest num-search-forward-test-2-8 ()
-    (with-temp-buffer
-        (insert "Hello000057 world!575")
-        (beginning-of-buffer)
-        (goto-char 10)
-        (num-search-forward 57)
-        (should (= (point) 12))))
-
-; =================================================
-
-(ert-deftest num-search-forward-test-3-1 ()
-    (with-temp-buffer
-        (insert "Hello000057 world!575")
-        (beginning-of-buffer)
-        (goto-char 10)
-        (should-error (num-search-forward 575))))
-
-(ert-deftest num-search-forward-test-3-2 ()
-    (with-temp-buffer
-        (insert "Hello000057 world!575\n")
-        (beginning-of-buffer)
-        (goto-char 10)
-        (num-search-forward 575)
-        (should (= (point) 22))))
-
-; =================================================
-
-(ert-deftest num-search-forward-test-base-1-1 ()
-    (with-temp-buffer
-        (insert "HelloFFF world!FFl.")
-        (beginning-of-buffer)
-        (num-search-forward 255 nil 16)
-        (should (= (point) 18))))
-
-(ert-deftest num-search-forward-test-base-1-2 ()
-    (with-temp-buffer
-        (insert "FFHelloFFF world!FFl.")
-        (beginning-of-buffer)
-        (num-search-forward 255 nil 16)
-        (should (= (point) 3))))
-
-(ert-deftest num-search-forward-test-base-1-3 ()
-    (with-temp-buffer
-        (insert "FFFHelloFFF world!FFl.")
-        (beginning-of-buffer)
-        (num-search-forward 255 nil 16)
-        (should (= (point) 21))))
-
-(ert-deftest num-search-forward-test-base-1-4 ()
-    (with-temp-buffer
-        (insert "FFHelloFFF world!FFl.")
-        (beginning-of-buffer)
-        (goto-char 2)
-        (num-search-forward 255 nil 16)
-        (should (= (point) 20))))
-
-; =================================================
-
-(ert-deftest num-search-forward-test-multi-line-1 ()
-    (with-temp-buffer
-        (insert "FFFHelloFF\nFFworldFFl.")
-        (beginning-of-buffer)
-        (num-search-forward 255 nil 16)
-        (should (= (point) 11))))
-
-(ert-deftest num-search-forward-test-multi-line-2 ()
-    (with-temp-buffer
-        (insert "FFFHelloFFF\nFFworldFFl.")
-        (beginning-of-buffer)
-        (num-search-forward 255 nil 16)
-        (should (= (point) 15))))
+        (should (= (point) 1))
+        (should (= (num-search-forward 255 nil 16) 3)) ; check search start of line
+        (should (= (num-search-forward 255 nil 16) 10)) ; skip leading and trailing (FFF)
+        (should (= (num-search-forward 255 nil 16) 15)) ; check leading plus
+        (should (= (num-search-forward 255 nil 16) 22)) ; check leading zeros
+        (should (= (num-search-forward -255 nil 16) 26)) ; negative number search
+        (should (= (num-search-forward -255 nil 16) 33)) ; negative number with leading zeros
+    ))
