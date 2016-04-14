@@ -12,7 +12,7 @@
     (with-temp-buffer
         (insert "Hello 55 World!")
         (beginning-of-buffer)
-        (should (= (num-search-forward 10 100) 9))))
+        (should (= (num-search-forward most-negative-fixnum most-positive-fixnum) 9))))
 
 (ert-deftest range-search-base-fail ()
     "Range search with BASE is not implemented."
