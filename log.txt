@@ -106,3 +106,8 @@
 
         Last, we will use the algorithm in part (a) and the regex generated to
         implement the search.
+
+    (c) where NUM2 is defined
+
+        Next I implemented the part where NUM2 is defined, which specifies a
+        range search in [NUM1, NUM2] (in number base BASE if defined).

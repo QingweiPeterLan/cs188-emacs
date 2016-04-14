@@ -37,8 +37,7 @@
     (with-temp-buffer
         (insert "Hello57 world!575")
         (beginning-of-buffer)
-        (num-search-forward -57)
-        (should (= (point) 1))))
+        (should-error (num-search-forward -57))))
 
 ; =================================================
 
@@ -46,8 +45,7 @@
     (with-temp-buffer
         (insert "Hello+00057 world!575")
         (beginning-of-buffer)
-        (num-search-forward -57)
-        (should (= (point) 1))))
+        (should-error (num-search-forward -57))))
 
 (ert-deftest num-search-forward-test-2-2 ()
     (with-temp-buffer
@@ -83,16 +81,14 @@
         (insert "Hello000057 world!575")
         (beginning-of-buffer)
         (goto-char 15)
-        (num-search-forward 57)
-        (should (= (point) 15))))
+        (should-error (num-search-forward 57))))
 
 (ert-deftest num-search-forward-test-2-7 ()
     (with-temp-buffer
         (insert "Hello000057 world!575")
         (beginning-of-buffer)
         (goto-char 11)
-        (num-search-forward 57)
-        (should (= (point) 11))))
+        (should-error (num-search-forward 57))))
 
 (ert-deftest num-search-forward-test-2-8 ()
     (with-temp-buffer
@@ -109,8 +105,7 @@
         (insert "Hello000057 world!575")
         (beginning-of-buffer)
         (goto-char 10)
-        (num-search-forward 575)
-        (should (= (point) 10))))
+        (should-error (num-search-forward 575))))
 
 (ert-deftest num-search-forward-test-3-2 ()
     (with-temp-buffer

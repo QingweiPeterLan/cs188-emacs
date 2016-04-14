@@ -5,14 +5,18 @@
   "Search for NUM1, or range [NUM1, NUM2], in base BASE (default 10)"
   (if BASE
     ; if BASE is defined
-    (if NUM2
+    (if (or (> BASE 16) (< BASE 2))
+      (error "Invalid range for BASE, should be between 2 and 16.")
+      (if NUM2
       ; if NUM2 is defined
       nil
       ; if NUM2 is not defined
       (if (re-search-forward (generate-start-regex-for-num-with-base NUM1 BASE) (line-end-position) t)
         (backward-char)
         (if (re-search-forward (generate-regex-for-num-with-base NUM1 BASE) nil t)
-          (backward-char))))
+          (backward-char)
+          (error "Search failed: number not found.")))))
+
     ; if BASE is not defined
     (if NUM2
       ; if NUM2 is defined
@@ -21,7 +25,8 @@
       (if (re-search-forward (generate-start-regex-for-num NUM1) (line-end-position) t)
         (backward-char)
         (if (re-search-forward (generate-regex-for-num NUM1) nil t)
-          (backward-char))))))
+          (backward-char)
+          (error "Search failed: number not found."))))))
 
 
 ; used for generating regex for number
