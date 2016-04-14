@@ -109,5 +109,7 @@
 
     (c) where NUM2 is defined
 
-        Next I implemented the part where NUM2 is defined, which specifies a
-        range search in [NUM1, NUM2] (in number base BASE if defined).
+        Next I tried to implement the part where NUM2 is defined, which
+        specifies a range search in [NUM1, NUM2] (in number base BASE if
+        defined). I did not come up with a solution in time for this so I
+        simply included the tests as failure in ERT.
