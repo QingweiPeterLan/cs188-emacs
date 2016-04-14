@@ -3,6 +3,7 @@
 ; funcion definition for 'num-search-forward'
 (defun num-search-forward (NUM1 &optional NUM2 BASE)
   "Search for NUM1, or range [NUM1, NUM2], in base BASE (default 10)"
+  (interactive "nEnter the number to search for: ")
   (if BASE
     ; if BASE is defined
     (if (or (> BASE 16) (< BASE 2))
